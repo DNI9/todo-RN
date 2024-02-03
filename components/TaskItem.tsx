@@ -1,32 +1,32 @@
-import { Task } from "@/types";
+import { Todo } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = {
-  task: Task;
+  todo: Todo;
   completeTask: (taskId: number) => void;
   deleteTask: (taskId: number) => void;
 };
 
-export default function TaskItem({ task, completeTask, deleteTask }: Props) {
+export default function TodoItem({ todo, completeTask, deleteTask }: Props) {
   return (
     <TouchableOpacity
-      onPress={() => completeTask(task.id)}
-      onLongPress={() => deleteTask(task.id)}
+      onPress={() => completeTask(todo.id)}
+      onLongPress={() => deleteTask(todo.id)}
     >
       <View
         className="flex-row gap-2 p-2 border border-gray-300 rounded-md"
-        style={{ opacity: task.done ? 0.5 : 1 }}
+        style={{ opacity: todo.done ? 0.5 : 1 }}
       >
         <Ionicons
-          name={task.done ? "checkbox" : "square-outline"}
+          name={todo.done ? "checkbox" : "square-outline"}
           size={24}
-          color={task.done ? "green" : "gray"}
+          color={todo.done ? "green" : "gray"}
         />
-        <Text className={`text-lg ${task.done ? "line-through" : ""}`}>
-          {task.title}
+        <Text className={`text-lg ${todo.done ? "line-through" : ""}`}>
+          {todo.title}
         </Text>
       </View>
     </TouchableOpacity>
