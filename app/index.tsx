@@ -1,5 +1,5 @@
-import { useDb } from "@/components/DatabaseProvider";
 import TaskItem from "@/components/TaskItem";
+import { db } from "@/db/client";
 import { todos, type Todo } from "@/db/schema";
 import { Ionicons } from "@expo/vector-icons";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function IndexPage() {
-  const db = useDb();
   const [tasks, setTasks] = useState<Todo[]>([]);
   const [newTask, setNewTask] = useState("");
   const completedTasks = useMemo(
