@@ -1,4 +1,6 @@
+import migrations from "@/drizzle/migrations";
 import { drizzle, type ExpoSQLiteDatabase } from "drizzle-orm/expo-sqlite";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { openDatabaseAsync, type SQLiteDatabase } from "expo-sqlite/next";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
@@ -62,9 +64,23 @@ export function DatabaseProvider({
 
   return (
     <DatabaseContext.Provider value={drizzleDbRef.current}>
-      {children}
+      <MigrationRunner>{children}</MigrationRunner>
     </DatabaseContext.Provider>
   );
+}
+
+function MigrationRunner({ children }: { children: React.ReactNode }) {
+  const db = useDb();
+  const { success, error } = useMigrations(db, migrations);
+
+  if (error) throw error;
+
+  if (!success) {
+    console.log("Database migrations is in progress");
+    return null;
+  }
+
+  return children;
 }
 
 export function useDb(): DrizzleExpoDb {

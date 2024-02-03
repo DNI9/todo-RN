@@ -1,48 +1,60 @@
+import { useDb } from "@/components/DatabaseProvider";
 import TaskItem from "@/components/TaskItem";
-import { Task } from "@/types";
+import { todos, type Todo } from "@/db/schema";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useMemo, useState } from "react";
+import { eq } from "drizzle-orm";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function IndexPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const db = useDb();
+  const [tasks, setTasks] = useState<Todo[]>([]);
   const [newTask, setNewTask] = useState("");
   const completedTasks = useMemo(
     () => tasks.filter((task) => task.done),
     [tasks]
   );
 
-  const completeTask = useCallback((taskId: number) => {
-    setTasks((prevTasks) => {
-      return prevTasks.map((prevTask) =>
-        prevTask.id === taskId
-          ? { ...prevTask, done: !prevTask.done }
-          : prevTask
-      );
-    });
+  const completeTask = useCallback((taskId: number, done: boolean) => {
+    db.update(todos)
+      .set({ done })
+      .where(eq(todos.id, taskId))
+      .then(() => {
+        setTasks((prevTasks) => {
+          return prevTasks.map((prevTask) =>
+            prevTask.id === taskId
+              ? { ...prevTask, done: !prevTask.done }
+              : prevTask
+          );
+        });
+      });
   }, []);
 
   const deleteTask = useCallback((taskId: number) => {
-    setTasks((prevTasks) => {
-      return prevTasks.filter((prevTask) => prevTask.id !== taskId);
-    });
+    db.delete(todos)
+      .where(eq(todos.id, taskId))
+      .then(() => {
+        setTasks((prevTasks) => {
+          return prevTasks.filter((prevTask) => prevTask.id !== taskId);
+        });
+      });
   }, []);
 
   const addTask = () => {
     if (!newTask.trim()) return;
 
-    setTasks((prevTasks) => {
-      return [
-        ...prevTasks,
-        {
-          id: tasks.length + 1,
-          title: newTask,
-          done: false,
-        },
-      ];
-    });
-    setNewTask("");
+    db.insert(todos)
+      .values({ title: newTask })
+      .returning()
+      .then((todo) => {
+        setTasks([...tasks, todo[0]]);
+        setNewTask("");
+      });
   };
+
+  useEffect(() => {
+    db.select().from(todos).then(setTasks);
+  }, []);
 
   return (
     <View className="p-3 gap-5 flex-1">

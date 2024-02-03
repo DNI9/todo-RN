@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1706962108557,
+      "tag": "0000_motionless_lethal_legion",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,19 +1,19 @@
-import { Task } from "@/types";
+import { type Todo } from "@/db/schema";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = {
-  task: Task;
-  completeTask: (taskId: number) => void;
+  task: Todo;
+  completeTask: (taskId: number, value: boolean) => void;
   deleteTask: (taskId: number) => void;
 };
 
 export default function TaskItem({ task, completeTask, deleteTask }: Props) {
   return (
     <TouchableOpacity
-      onPress={() => completeTask(task.id)}
+      onPress={() => completeTask(task.id, !task.done)}
       onLongPress={() => deleteTask(task.id)}
     >
       <View
