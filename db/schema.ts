@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const todos = sqliteTable(
+export const todoTable = sqliteTable(
   "todos",
   {
     id: integer("id").primaryKey(),
@@ -11,9 +11,9 @@ export const todos = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (table) => ({
+  table => ({
     titleIdx: index("titleIdx").on(table.title),
   })
 );
 
-export type Todo = typeof todos.$inferSelect;
+export type Todo = typeof todoTable.$inferSelect;
