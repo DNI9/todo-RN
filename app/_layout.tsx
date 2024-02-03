@@ -1,12 +1,13 @@
+import { DatabaseProvider } from "@/components/DatabaseProvider";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import "@/global.css";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,17 +48,19 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <Stack>
-          <Stack.Screen
-            name="index"
-            options={{
-              headerTitle: "Tasks",
-            }}
-          />
-        </Stack>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <DatabaseProvider databaseName="todos.db">
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <Stack>
+            <Stack.Screen
+              name="index"
+              options={{
+                headerTitle: "Tasks",
+              }}
+            />
+          </Stack>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </DatabaseProvider>
   );
 }
