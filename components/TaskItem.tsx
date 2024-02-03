@@ -19,7 +19,7 @@ export default function TaskItem({ task }: Props) {
       onLongPress={() => deleteTodo(task.id)}
     >
       <View
-        className="flex-row gap-2 p-2 border border-gray-300 rounded-md"
+        className="flex-row gap-2 p-4 border border-gray-300 rounded-md"
         style={{ opacity: task.done ? 0.5 : 1 }}
       >
         <Ionicons

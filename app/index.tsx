@@ -1,8 +1,14 @@
-import TaskList from "@/components/TaskList";
+import TaskItem from "@/components/TaskItem";
 import { useTodoStore } from "@/hooks/useTodoStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function IndexPage() {
   const [newTodo, setNewTodo] = useState("");
@@ -17,22 +23,46 @@ export default function IndexPage() {
 
   return (
     <View className="p-3 gap-5 flex-1">
-      <View>
-        <Text className="font-medium text-xl mb-2">Active tasks</Text>
-        <TaskList todos={activeTodos} emptyMessage="No active tasks" />
-      </View>
+      <FlatList
+        className="flex-1"
+        data={activeTodos}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => <TaskItem task={item} />}
+        contentContainerClassName="gap-2"
+        ListEmptyComponent={() => (
+          <Text className="text-center mt-5 text-gray-400">
+            No active todos
+          </Text>
+        )}
+        ListHeaderComponent={() => (
+          <Text className="font-medium text-xl mb-2">Active todos</Text>
+        )}
+      />
 
-      <View>
-        <Text className="font-medium text-xl mb-2">Completed tasks</Text>
-        <TaskList todos={completedTodos} emptyMessage="No completed tasks" />
-      </View>
+      {completedTodos.length > 0 ? (
+        <FlatList
+          className="flex-1"
+          data={completedTodos}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <TaskItem task={item} />}
+          contentContainerClassName="gap-2"
+          ListEmptyComponent={() => (
+            <Text className="text-center mt-5 text-gray-400">
+              No completed todos
+            </Text>
+          )}
+          ListHeaderComponent={() => (
+            <Text className="font-medium text-xl mb-2">Completed todos</Text>
+          )}
+        />
+      ) : null}
 
       <View className="gap-2 mt-auto flex-row items-center">
         <TextInput
           value={newTodo}
           onChangeText={setNewTodo}
           placeholder="add new task"
-          className="border border-gray-300 p-3 px-5 rounded-full flex-1"
+          className="border border-gray-400 p-3 px-5 rounded-full flex-1 bg-gray-200"
         />
         <TouchableOpacity
           onPress={() => {
