@@ -1,74 +1,28 @@
 import TaskItem from "@/components/TaskItem";
-import { db } from "@/db/client";
-import { todos, type Todo } from "@/db/schema";
+import useTodos from "@/hooks/useTodos";
 import { Ionicons } from "@expo/vector-icons";
-import { eq } from "drizzle-orm";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function IndexPage() {
-  const [tasks, setTasks] = useState<Todo[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const completedTasks = useMemo(
-    () => tasks.filter((task) => task.done),
-    [tasks]
-  );
-
-  const completeTask = useCallback((taskId: number, done: boolean) => {
-    db.update(todos)
-      .set({ done })
-      .where(eq(todos.id, taskId))
-      .then(() => {
-        setTasks((prevTasks) => {
-          return prevTasks.map((prevTask) =>
-            prevTask.id === taskId
-              ? { ...prevTask, done: !prevTask.done }
-              : prevTask
-          );
-        });
-      });
-  }, []);
-
-  const deleteTask = useCallback((taskId: number) => {
-    db.delete(todos)
-      .where(eq(todos.id, taskId))
-      .then(() => {
-        setTasks((prevTasks) => {
-          return prevTasks.filter((prevTask) => prevTask.id !== taskId);
-        });
-      });
-  }, []);
-
-  const addTask = () => {
-    if (!newTask.trim()) return;
-
-    db.insert(todos)
-      .values({ title: newTask })
-      .returning()
-      .then((todo) => {
-        setTasks([...tasks, todo[0]]);
-        setNewTask("");
-      });
-  };
-
-  useEffect(() => {
-    db.select().from(todos).then(setTasks);
-  }, []);
+  const { activeTodos, completedTodos, addTodo, completeTodo, deleteTodo } =
+    useTodos();
+  const [newTodo, setNewTodo] = useState("");
 
   return (
     <View className="p-3 gap-5 flex-1">
       <View>
         <Text className="font-medium text-xl mb-2">Active tasks</Text>
         <View className="gap-2">
-          {tasks.length > 0 ? (
-            tasks
-              .filter((task) => !task.done)
-              .map((task) => (
+          {activeTodos.length > 0 ? (
+            activeTodos
+              .filter(todo => !todo.done)
+              .map(todo => (
                 <TaskItem
-                  key={task.id}
-                  task={task}
-                  completeTask={completeTask}
-                  deleteTask={deleteTask}
+                  key={todo.id}
+                  task={todo}
+                  completeTask={completeTodo}
+                  deleteTask={deleteTodo}
                 />
               ))
           ) : (
@@ -87,13 +41,13 @@ export default function IndexPage() {
       <View>
         <Text className="font-medium text-xl mb-2">Completed tasks</Text>
         <View className="gap-2">
-          {completedTasks.length > 0 ? (
-            completedTasks.map((task) => (
+          {completedTodos.length > 0 ? (
+            completedTodos.map(task => (
               <TaskItem
                 key={task.id}
                 task={task}
-                completeTask={completeTask}
-                deleteTask={deleteTask}
+                completeTask={completeTodo}
+                deleteTask={deleteTodo}
               />
             ))
           ) : (
@@ -106,13 +60,18 @@ export default function IndexPage() {
 
       <View className="gap-2 mt-auto flex-row items-center">
         <TextInput
-          value={newTask}
-          onChangeText={setNewTask}
+          value={newTodo}
+          onChangeText={setNewTodo}
           placeholder="add new task"
           className="border border-gray-300 p-3 px-5 rounded-full flex-1"
         />
         <TouchableOpacity
-          onPress={addTask}
+          onPress={() => {
+            if (newTodo.trim()) {
+              addTodo(newTodo);
+              setNewTodo("");
+            }
+          }}
           className="p-3 bg-black rounded-full"
         >
           <Ionicons name="send" size={25} color="white" />
