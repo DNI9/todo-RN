@@ -5,13 +5,16 @@ import { create } from "zustand";
 
 interface TodoState {
   todos: Todo[];
+  filtered: Todo[];
   add: (title: string) => void;
   complete: (id: number, done: boolean) => void;
   delete: (id: number) => void;
+  search: (keyword: string) => void;
 }
 
 export const useTodoStore = create<TodoState>()(set => ({
   todos: [],
+  filtered: [],
 
   add: async (title: string) => {
     const todo = await db.insert(todoTable).values({ title }).returning();
@@ -30,6 +33,12 @@ export const useTodoStore = create<TodoState>()(set => ({
   delete: async (id: number) => {
     await db.delete(todoTable).where(eq(todoTable.id, id));
     set(state => ({ todos: state.todos.filter(todo => todo.id !== id) }));
+  },
+
+  search: (keyword: string) => {
+    set(state => ({
+      filtered: state.todos.filter(todo => todo.title.includes(keyword)),
+    }));
   },
 }));
 

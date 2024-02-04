@@ -1,10 +1,12 @@
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import "@/global.css";
 import { useInitSetup } from "@/hooks/useInitSetup";
+import { Ionicons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
 
 // Catch any errors thrown by the Layout component.
 export { ErrorBoundary } from "expo-router";
@@ -32,9 +34,17 @@ function RootLayoutNav() {
           <Stack.Screen
             name="index"
             options={{
-              headerTitle: "Tasks",
+              headerTitle: "Todos",
+              headerRight: () => (
+                <Link href="/search" asChild>
+                  <TouchableOpacity onPress={() => {}}>
+                    <Ionicons name="search" size={20} />
+                  </TouchableOpacity>
+                </Link>
+              ),
             }}
           />
+          <Stack.Screen name="search" options={{ headerTitle: "Search" }} />
         </Stack>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
